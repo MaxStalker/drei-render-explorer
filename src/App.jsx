@@ -1,8 +1,14 @@
 import ReactDOM from "react-dom";
 import React, { useRef, useState } from "react";
+import { useControls } from "leva";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
-import { PresentationControls, Center, Billboard } from "@react-three/drei";
+import {
+  PresentationControls,
+  Center,
+  Billboard,
+  Backdrop,
+} from "@react-three/drei";
 import { softShadows } from "@react-three/drei";
 import { Sky } from "@react-three/drei";
 import "./index.css";
@@ -48,28 +54,23 @@ function Flovatar(props) {
 
 function Torch(props) {
   const ref = useRef();
-  const torchColor = "#a22c01";
+  const { flameColor, flameFalloff, torchColor, flameIntensity = 10 } = props;
   const torchIntensity = 8;
   const torchMax = 6;
   const torchDecay = 2;
 
-  const flameColor = "#f88b00";
-  const flameIntensity = 20;
   const flameMax = 2;
-  const flameDecay = 1;
 
   return (
-    <group {...props}>
+    <group {...props} ref={ref}>
       <pointLight
         castShadows
-        ref={ref}
         args={[torchColor, torchIntensity, torchMax, torchDecay]}
       />
       <pointLight
         castShadows
-        position={[0, -0.6, 0]}
-        ref={ref}
-        args={[flameColor, flameIntensity, flameMax, flameDecay]}
+        position={[0, -0.7, 0]}
+        args={[flameColor, flameIntensity, flameFalloff, 1.75]}
       />
     </group>
   );
@@ -78,17 +79,80 @@ function Torch(props) {
 function App(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF(path);
-  /*  const ref = useRef();
-   */
-  // console.log(ref.current.rotation.x)
 
-  const ambientColor = "#062060";
+  // Leva Controls;
+  const ambientControls = useControls(
+    "Ambient Light",
+    {
+      color: "#0f0727",
+      intensity: {
+        value: 0.5,
+        min: 0,
+        max: 0.5,
+        step: 0.01,
+      },
+    },
+    {
+      collapsed: true,
+    }
+  );
+
+  const fillControls = useControls(
+    "Fill Light",
+    {
+      color: "#ffb705",
+      intensity: {
+        value: 10,
+        min: 0,
+        max: 10,
+        step: 0.01,
+      },
+    },
+    {
+      collapsed: true,
+    }
+  );
+
+  const torchControls = useControls(
+    "Torch Controls",
+    {
+      torchColor: "#a22c01",
+      flameColor: `#f55605`,
+
+      flameIntensity: {
+        value: 15,
+        min: 0,
+        max: 20,
+        step: 0.01,
+      },
+      flameFalloff: {
+        value: 3.5,
+        min: 0,
+        max: 20,
+        step: 0.01,
+      },
+    },
+    {
+      collapsed: true,
+    }
+  );
 
   return (
     <Canvas flat dpr={[1, 2]} camera={{ fov: 35, position: [0, -2, 22] }}>
-      <ambientLight intensity={0.1} args={[ambientColor]} />
-      <Torch position={[-1.7, 0.25, 0]} />
-      <Torch position={[1.7, 0.25, 0]} />
+      <ambientLight
+        intensity={ambientControls.intensity}
+        args={[ambientControls.color]}
+      />
+
+      <Torch position={[-1.7, 0.25, 0]} {...torchControls} />
+      <Torch position={[1.7, 0.25, 0]} {...torchControls} />
+
+      <pointLight
+        castShadows
+        position={[0, 0.75, 3.5]}
+        args={[fillControls.color, fillControls.intensity, 3.5, 1]}
+      />
+
       <PresentationControls
         global
         rotation={[Math.PI / 10, Math.PI, 0]} // Default rotation
