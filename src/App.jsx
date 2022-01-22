@@ -12,6 +12,7 @@ import {
 import { softShadows } from "@react-three/drei";
 import { Sky } from "@react-three/drei";
 import "./index.css";
+import { FillView } from "./Components";
 
 const path = "/models/diorama.glb";
 useGLTF.preload(path);
@@ -138,7 +139,12 @@ function App(props) {
   );
 
   return (
-    <Canvas flat dpr={[1, 2]} camera={{ fov: 35, position: [0, -2, 22] }}>
+    <Canvas
+      flat
+      dpr={[1, 2]}
+      camera={{ fov: 35, position: [0, -2, 22] }}
+      resize={{ scroll: false }}
+    >
       <ambientLight
         intensity={ambientControls.intensity}
         args={[ambientControls.color]}
