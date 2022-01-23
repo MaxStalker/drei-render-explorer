@@ -5,14 +5,20 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import {
   PresentationControls,
+  PerspectiveCamera,
   Center,
   Billboard,
   Backdrop,
+  OrbitControls,
 } from "@react-three/drei";
 import { softShadows } from "@react-three/drei";
 import { Sky } from "@react-three/drei";
 import "./index.css";
 import { FillView } from "./Components";
+
+import { MathUtils, Vector3 } from "three";
+import OrbitCamera from "./OrbitCamera";
+import CustomOrbitCamera from "./CustomOrbitCamera";
 
 const path = "/models/diorama.glb";
 useGLTF.preload(path);
@@ -34,7 +40,7 @@ function Flovatar(props) {
 
   // Return the view, these are regular Threejs elements expressed in JSX
   return (
-    <Billboard follow={true} lockX={false} lockY={false} lockZ={false}>
+    <Billboard follow={true} lockX={true} lockY={false} lockZ={true}>
       <mesh
         {...props}
         ref={ref}
@@ -76,6 +82,28 @@ function Torch(props) {
     </group>
   );
 }
+
+const dummy = new Vector3();
+const lookAtPos = new Vector3();
+
+/*function Camera(props) {
+  const zoom = false;
+  useFrame((state, delta) => {
+    const step = 0.1;
+    state.camera.fov = 50 //MathUtils.lerp(state.camera.fov, zoom ? 10 : 42, step);
+    /!*state.camera.position.lerp(
+      dummy.set(zoom ? 25 : 10, zoom ? 1 : 5, zoom ? 0 : 10),
+      step
+    );*!/
+    state.camera.setPosition([0, 5, 20])
+
+    lookAtPos.x = Math.sin(state.clock.getElapsedTime() * 2);
+
+    state.camera.lookAt(lookAtPos);
+    state.camera.updateProjectionMatrix();
+  });
+  return null;
+}*/
 
 function App(props) {
   const group = useRef();
@@ -142,7 +170,6 @@ function App(props) {
     <Canvas
       flat
       dpr={[1, 2]}
-      camera={{ fov: 35, position: [0, -2, 22] }}
       resize={{ scroll: false }}
     >
       <ambientLight
@@ -153,33 +180,33 @@ function App(props) {
       <Torch position={[-1.7, 0.25, 0]} {...torchControls} />
       <Torch position={[1.7, 0.25, 0]} {...torchControls} />
 
+      <OrbitCamera />
+
       <pointLight
         castShadows
-        position={[0, 0.75, 3.5]}
+        position={[0, 1, -2]}
         args={[fillControls.color, fillControls.intensity, 3.5, 1]}
       />
-
-      <PresentationControls
+      {/*      <PresentationControls
         global
         rotation={[Math.PI / 10, Math.PI, 0]} // Default rotation
         polar={[-Math.PI / 16, Math.PI / 8]} // Vertical limits
         azimuth={[-Math.PI / 8, Math.PI / 8]} // Horizontal limits
-      >
-        {/* Flovatar Rendering Here*/}
-        <Center>
-          <group ref={group} {...props} dispose={null}>
-            <group rotation={[-Math.PI, 0, -Math.PI]}>
-              <mesh
-                castShadow
-                receiveShadow
-                geometry={nodes.Cube082.geometry}
-                material={materials.Grossing}
-              />
-              <Flovatar />
-            </group>
+      >*/}
+      {/* Flovatar Rendering Here*/}
+      <Center>
+        <group ref={group} {...props} dispose={null}>
+          <group rotation={[-Math.PI, 0, -Math.PI]}>
+            <mesh
+              castShadow
+              receiveShadow
+              geometry={nodes.Cube082.geometry}
+              material={materials.Grossing}
+            />
+            <Flovatar />
           </group>
-        </Center>
-      </PresentationControls>
+        </group>
+      </Center>
     </Canvas>
   );
 }
