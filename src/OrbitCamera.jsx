@@ -3,6 +3,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { useEffect, useRef } from "react";
 import { PerspectiveCamera } from "@react-three/drei";
 import { Vector3 } from "three";
+import { useControls } from "leva";
 
 /*const lookAtFlovatar = new Vector3(0, 0, 0);
 const OrbitCamera = () => {
@@ -41,20 +42,29 @@ const OrbitCamera = () => {
   // Ref to the controls, so that we can update them on every frame using useFrame
   const controls = useRef();
   useFrame((state) => controls.current.update());
+
+  const { position } = useControls({
+    position: {
+      x: 0,
+      y: 2,
+      z: -20,
+    },
+  });
+
   return (
     <group>
       <PerspectiveCamera
         makeDefault
-        position={[0, 0.75, -30]}
+        position={[position.x, position.y, position.z]}
       />
       <orbitControls
         ref={controls}
         args={[camera, domElement]}
         enableZoom={false}
-        maxAzimuthAngle={Math.PI / 4}
-        maxPolarAngle={Math.PI}
-        minAzimuthAngle={-Math.PI / 4}
-        minPolarAngle={0}
+        maxAzimuthAngle={Math.PI * 1.2}
+        minAzimuthAngle={Math.PI * 1.2 - Math.PI / 4}
+        maxPolarAngle={Math.PI / 4 + Math.PI / 4}
+        minPolarAngle={Math.PI / 4}
         enableDamping
         rotateSpeed={0.5}
         dampingFactor={0.05}

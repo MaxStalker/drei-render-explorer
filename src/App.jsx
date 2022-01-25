@@ -167,11 +167,7 @@ function App(props) {
   );
 
   return (
-    <Canvas
-      flat
-      dpr={[1, 2]}
-      resize={{ scroll: false }}
-    >
+    <Canvas flat dpr={[1, 2]} resize={{ scroll: false }}>
       <ambientLight
         intensity={ambientControls.intensity}
         args={[ambientControls.color]}
@@ -194,12 +190,11 @@ function App(props) {
         azimuth={[-Math.PI / 8, Math.PI / 8]} // Horizontal limits
       >*/}
       {/* Flovatar Rendering Here*/}
+
       <Center>
         <group ref={group} {...props} dispose={null}>
           <group rotation={[-Math.PI, 0, -Math.PI]}>
             <mesh
-              castShadow
-              receiveShadow
               geometry={nodes.Cube082.geometry}
               material={materials.Grossing}
             />
