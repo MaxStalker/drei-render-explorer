@@ -20,7 +20,12 @@ import { MathUtils, Vector3 } from "three";
 import OrbitCamera from "./OrbitCamera";
 import CustomOrbitCamera from "./CustomOrbitCamera";
 
-const path = "/models/diorama.glb";
+// Components
+import Torch from "./Torch";
+import controls from "./controls";
+
+const path = "/models/secondary/dungeon.glb";
+//const path = "/models/diorama.glb";
 useGLTF.preload(path);
 softShadows({
   frustum: 3.75,
@@ -40,45 +45,13 @@ function Flovatar(props) {
 
   // Return the view, these are regular Threejs elements expressed in JSX
   return (
-    <Billboard follow={true} lockX={true} lockY={false} lockZ={true}>
-      <mesh
-        {...props}
-        ref={ref}
-        geometry={nodes.Cube082_1.geometry}
-        material={materials.Flovatar}
-      />
-    </Billboard>
-    /*    <group rotation={[0, Math.PI/4, 0]}>
-      <mesh
-        {...props}
-        ref={ref}
-        geometry={nodes.Cube082_1.geometry}
-        material={materials.Flovatar}
-      />
-    </group>*/
-  );
-}
-
-function Torch(props) {
-  const ref = useRef();
-  const { flameColor, flameFalloff, torchColor, flameIntensity = 10 } = props;
-  const torchIntensity = 8;
-  const torchMax = 6;
-  const torchDecay = 2;
-
-  const flameMax = 2;
-
-  return (
-    <group {...props} ref={ref}>
-      <pointLight
-        castShadows
-        args={[torchColor, torchIntensity, torchMax, torchDecay]}
-      />
-      <pointLight
-        castShadows
-        position={[0, -0.7, 0]}
-        args={[flameColor, flameIntensity, flameFalloff, 1.75]}
-      />
+    <group>
+      <Billboard
+        follow={true}
+        lockX={false}
+        lockY={false}
+        lockZ={false}
+      ></Billboard>
     </group>
   );
 }
@@ -108,63 +81,9 @@ const lookAtPos = new Vector3();
 function App(props) {
   const group = useRef();
   const { nodes, materials } = useGLTF(path);
+  const [ambientControls, fillControls, torchControls, camera] = controls();
 
-  // Leva Controls;
-  const ambientControls = useControls(
-    "Ambient Light",
-    {
-      color: "#0f0727",
-      intensity: {
-        value: 0.5,
-        min: 0,
-        max: 0.5,
-        step: 0.01,
-      },
-    },
-    {
-      collapsed: true,
-    }
-  );
-
-  const fillControls = useControls(
-    "Fill Light",
-    {
-      color: "#ffb705",
-      intensity: {
-        value: 10,
-        min: 0,
-        max: 10,
-        step: 0.01,
-      },
-    },
-    {
-      collapsed: true,
-    }
-  );
-
-  const torchControls = useControls(
-    "Torch Controls",
-    {
-      torchColor: "#a22c01",
-      flameColor: `#f55605`,
-
-      flameIntensity: {
-        value: 15,
-        min: 0,
-        max: 20,
-        step: 0.01,
-      },
-      flameFalloff: {
-        value: 3.5,
-        min: 0,
-        max: 20,
-        step: 0.01,
-      },
-    },
-    {
-      collapsed: true,
-    }
-  );
+  console.log({ ambientControls });
 
   return (
     <Canvas flat dpr={[1, 2]} resize={{ scroll: false }}>
@@ -173,16 +92,9 @@ function App(props) {
         args={[ambientControls.color]}
       />
 
-      <Torch position={[-1.7, 0.25, 0]} {...torchControls} />
-      <Torch position={[1.7, 0.25, 0]} {...torchControls} />
+      <mesh geometry={nodes.base001.geometry} material={materials.Grossing} />
+      <OrbitCamera position={camera.position} />
 
-      <OrbitCamera />
-
-      <pointLight
-        castShadows
-        position={[0, 1, -2]}
-        args={[fillControls.color, fillControls.intensity, 3.5, 1]}
-      />
       {/*      <PresentationControls
         global
         rotation={[Math.PI / 10, Math.PI, 0]} // Default rotation
@@ -191,17 +103,24 @@ function App(props) {
       >*/}
       {/* Flovatar Rendering Here*/}
 
-      <Center>
-        <group ref={group} {...props} dispose={null}>
-          <group rotation={[-Math.PI, 0, -Math.PI]}>
-            <mesh
-              geometry={nodes.Cube082.geometry}
-              material={materials.Grossing}
-            />
-            <Flovatar />
-          </group>
+      {/*      <group ref={group} {...props} dispose={null}>
+        <group rotation={[-Math.PI, 0, -Math.PI]}>
+          <Torch position={[-1.7, 3, -0.5]} {...torchControls} />
+          <Torch position={[1.7, 3, -0.5]} {...torchControls} />
+
+          <mesh
+            geometry={nodes.base001.geometry}
+            material={materials.Grossing}
+          />
+          <mesh
+            position={[0, 5, 0]}
+            rotation={[Math.PI/2, 0, Math.PI]}
+            geometry={nodes.flovatar.geometry}
+            material={materials.flovatar}
+          />
+          <Flovatar position={[0, 5, 0]} rotation={[Math.PI, 0, 0]} />
         </group>
-      </Center>
+      </group>*/}
     </Canvas>
   );
 }

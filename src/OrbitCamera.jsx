@@ -31,7 +31,7 @@ const OrbitCamera = () => {
 };*/
 
 extend({ OrbitControls });
-const OrbitCamera = () => {
+const OrbitCamera = (props) => {
   // Get a reference to the Three.js Camera, and the canvas html element.
   // We need these to setup the OrbitControls component.
   // https://threejs.org/docs/#examples/en/controls/OrbitControls
@@ -43,13 +43,7 @@ const OrbitCamera = () => {
   const controls = useRef();
   useFrame((state) => controls.current.update());
 
-  const { position } = useControls({
-    position: {
-      x: 0,
-      y: 2,
-      z: -20,
-    },
-  });
+  const { position } = props;
 
   return (
     <group>
@@ -61,10 +55,10 @@ const OrbitCamera = () => {
         ref={controls}
         args={[camera, domElement]}
         enableZoom={false}
-        maxAzimuthAngle={Math.PI * 1.2}
+        /*        maxAzimuthAngle={Math.PI * 1.2}
         minAzimuthAngle={Math.PI * 1.2 - Math.PI / 4}
         maxPolarAngle={Math.PI / 4 + Math.PI / 4}
-        minPolarAngle={Math.PI / 4}
+        minPolarAngle={Math.PI / 4}*/
         enableDamping
         rotateSpeed={0.5}
         dampingFactor={0.05}
